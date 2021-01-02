@@ -11,5 +11,19 @@ Date: Jan 1 2021
 
 int main(int argc, char *argv[])
 {
+	FILE 		*fpt;
+	unsigned char 	*image;
+	char 		header[80];
+	int		ROWS,COLS,BYTES;
+	int		i,j,b;
+
+	// Validating command line arguments 
+	if(argc != 3)
+	{
+		printf("Missing inputs \n Usage: conv [filename] [amount] ");
+		exit(0);
+	}
+
 	
+
 }
