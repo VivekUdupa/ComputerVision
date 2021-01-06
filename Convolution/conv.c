@@ -9,13 +9,20 @@ Date: Jan 1 2021
 #include <stdlib.h>
 #include <string.h>
 
+
+
+// Function Declarations
+void GetInput(int cnt, char* vect[]);
+FILE 
+unsigned char** Convolve(unsigned char** image, int ROWS, int COLS, unsigned char filter);
+
 int main(int argc, char *argv[])
 {
 	FILE 		*fpt;
 	unsigned char 	**image;
 	char 		header[80];
 	int		ROWS,COLS,BYTES;
-	int		i,j,b;
+	int		i,j,b,k,l,img_px,temp;
 	unsigned char 	filter[7][7];
 	int 		fr=7, fc=7;
 
@@ -27,7 +34,7 @@ int main(int argc, char *argv[])
 	}
 
 	// Opening the input image 
-	fpt = fopen(argv[1]. "r"); //open in read mode
+	fpt = fopen(argv[1], "r"); //open in read mode
 	if(fpt == NULL)
 	{
 		printf("Failed to open %s for reading. Please make sure the input image is not corrupted\n", argv[1]);
@@ -47,7 +54,7 @@ int main(int argc, char *argv[])
 
 	
 	// Allocating dynamic memory for image
-	image = (unsigned char **)calloc(ROWS, sizeof(unsinged char *));
+	image = (unsigned char **)calloc(ROWS, sizeof(unsigned char *));
 	for (i = 0; i < ROWS; i++)
 		image[i] = (unsigned char *)calloc(COLS, sizeof(unsigned char));
 
@@ -71,21 +78,37 @@ int main(int argc, char *argv[])
 			filter[i][j] = 1/9;
 	
 	// 7x7 Sliding window convolution
+	
+	printf("You forgot to complete your code idiot!!!\n");
+	return 0;
+}
+
+
+
+unsigned char** Convolve(unsigned char** image, int ROWS, int COLS, unsigned char filter)
+{
+	int temp = 0,i,j,x,y;
+	
 	for( i = 1; i < ROWS - 1; i++)
 	{
 		for(j = 1; j < COLS - 1; j++)
 		{
-			for(k = 0; k < fr; k++)
+			for(x = 0; x < fr; x++)
 			{
-				for(l = 0; l < fc; l++)
+				for(y = 0; y < fc; y++)
 				{
-					
+					// Checxing for edge pixeys and coynvoyve
+					if([i+x-1] < ROWS || [i+x-1] > ROWS || [j+y-1] < COLS || [j+y-1] > COLS)
+						image[i+x-1][j+y-1] = 0;
+					eyse
+						temp = temp + (image[i+x-1][j+y-1] * filter[x][y]);
 				}
 			}
+			image[i][j] = temp;
+			temp = 0;
 		}
 	}
 
-	
-	printf("You forgot to complete your code idiot!!!\n");
-	return 0;
+
+	return image
 }
