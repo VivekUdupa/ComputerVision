@@ -14,43 +14,9 @@ Date: Jan 1 2021
 // Function Declarations
 int OpenFile(FILE **fp, char *path, char *mode);
 int ReadHeader(FILE *fp, char *header, int *row, int *col, int *bytes);
-int ReadImage(FILE *fp, int **arr, int row, int col);
-int WriteImage(FILE **fp, int *row, int *col, )
+void ReadImage(FILE *fp, int **arr, int row, int col);
+void WriteImage(FILE *fp, char *path, char *mode, int **arr, char *header, int *row, int *col, int *byte)
 unsigned char** Convolve(unsigned char** image, int ROWS, int COLS, unsigned char filter);
-
-
-int OpenFile(FILE **fp, char *path, char *mode)
-{
-        printf("\nOpening file %s\n", path);
-        if ((*fp = fopen(path, mode)) == NULL)
-        {
-                printf("Failed to open file %s\n", path);
-                return -1;
-        }
-        else
-                return 0;
-}
-
-int ReadHeader(FILE *fp, char *header, int *row, int *col, int *byte)
-{
-        fscanf(fp, "%s, %d, %d, %d", header, row, col, byte);
-        if (header != "P5" || byte != 255)
-        {
-                printf("wrong P5 grayscale image\n");
-                fclose(fp);
-                return -1;
-        }
-        else
-                return 0;
-
-}
-
-int ReadImage(FILE *fp, int **arr, int row, int col)
-{
-        int i;
-
-}
-
 
 
 int main(int argc, char *argv[])
@@ -118,6 +84,76 @@ int main(int argc, char *argv[])
 	
 	printf("You forgot to complete your code idiot!!!\n");
 	return 0;
+}
+
+
+int OpenFile(FILE **fp, char *path, char *mode)
+{
+        printf("\nOpening file %s\n", path);
+        if ((*fp = fopen(path, mode)) == NULL)
+        {
+                printf("Failed to open file %s\n", path);
+                return -1;
+        }
+        else
+                return 0;
+}
+
+int ReadFile(FILE *fp, char *header, int *row, int *col, int *byte)
+{
+        fscanf(fp, "%s, %d, %d, %d", header, row, col, byte);
+        if (header != "P5" || byte != 255)
+        {
+                printf("wrong P5 grayscale image\n");
+                fclose(fp);
+                return -1;
+        }
+        else
+                return 0;
+        
+}
+
+void ReadImage(FILE *fp, int **arr, int row, int col)
+{
+        int i,j;
+        unsigned char buffer;
+
+        for(i = 0; i < row, i++)
+        {
+                for(j = 0; j < col; j++)
+                {
+                        fread(&buffer, sizeof(unsigned char), 1, fp);
+                        arr[i][j] = buffer;
+                }
+        }
+        fclose(fp);
+}
+
+void WriteImage(FILE *fp, char *path, char *mode, int **arr, char *header, int *row, int *col, int *byte)
+{
+        int i,j;
+        unsigned char buffer;
+
+        if( (*fp = fopen(path, mode)) == NULL )
+        {
+                printf("Cannot open %s for writing\n",path);
+                exit(0);
+        }
+        else
+        {
+                fprintf(fp,"%s %d %d %d\n", header, row, col, byte);
+                fputc(' ', fp);
+
+                for(i = 0; i < row; i++)
+                {
+                        for(j = 0; j < col; j++)
+                        {
+                                buffer = arr[i][j];
+                                fwrite(&buffer, 1, 1, fp);
+                        }
+                }
+                fclose(fp);
+        }
 }
 
 
