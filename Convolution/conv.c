@@ -12,10 +12,18 @@ Date: Jan 1 2021
 
 
 // Function Declarations
+
+// File Operations
 int OpenFile(FILE **fp, char *path, char *mode);
 int ReadHeader(FILE *fp, char *header, int *row, int *col, int *bytes);
 void ReadImage(FILE *fp, int **arr, int row, int col);
 void WriteImage(FILE *fp, char *path, char *mode, int **arr, char *header, int *row, int *col, int *byte);
+
+// Memory management
+void arry_create(unsigned char ***arry, int *rows, int *cols);
+
+// Convolution operations
+int SF_Conv(unsigned char ***image_in, unsigned char ***image_out, unsigned char *header, int *Rows, int *Cols, int *Bytes, int *window)
 unsigned char** Convolve(unsigned char** image, int ROWS, int COLS, unsigned char filter);
 
 
@@ -155,6 +163,17 @@ void WriteImage(FILE *fp, char *path, char *mode, int **arr, char *header, int *
                 fclose(fp);
         }
 }
+
+// ************************ Allocate Memory for array ***************************
+void arry_create(unsigned char ***arry, int *rows, int *cols)
+{
+    arry = (unsigned char **) calloc(rows, sizeof(unsigned char*));
+    for(int i = 0; i < rows; i++)
+        arr[i] = (unsigned char *) calloc(cols, sizeof(unsigned char));
+
+}
+
+
 
 // **************************************** Seperable Filter Convolution ***********************************
 int SF_Conv(unsigned char ***image_in, unsigned char ***image_out, unsigned char *header, int *Rows, int *Cols, int *Bytes, int *window)
