@@ -15,7 +15,7 @@ Date: Jan 1 2021
 int OpenFile(FILE **fp, char *path, char *mode);
 int ReadHeader(FILE *fp, char *header, int *row, int *col, int *bytes);
 void ReadImage(FILE *fp, int **arr, int row, int col);
-void WriteImage(FILE *fp, char *path, char *mode, int **arr, char *header, int *row, int *col, int *byte)
+void WriteImage(FILE *fp, char *path, char *mode, int **arr, char *header, int *row, int *col, int *byte);
 unsigned char** Convolve(unsigned char** image, int ROWS, int COLS, unsigned char filter);
 
 
@@ -156,7 +156,69 @@ void WriteImage(FILE *fp, char *path, char *mode, int **arr, char *header, int *
         }
 }
 
+// **************************************** Seperable Filter Convolution ***********************************
+int SF_Conv(unsigned char ***image_in, unsigned char ***image_out, unsigned char *header, int *Rows, int *Cols, int *Bytes, int *window)
+{
+    // This function performs Row + Column seperable mean filter convolution 
 
+    int i, j, x, y;
+    unsigned char buffer[Rows][Cols];
+    unsigned char sum, pixel_val;
+
+    // ROW wise convolution 
+    for(i = 0; i < Rows; i++)
+    {
+        for(j = 0; j < Cols; j++)
+        {
+            sum = 0;
+            for(x = 0; x < window; x++)
+            {
+                // check image boundary
+                if ( (j + x) >= Cols)
+                    pixel_val = 0;
+                else
+                    pixel_val = image_in[i][j+x];
+            
+                //  Calculate Sum
+                sum += pixel_val;
+
+            }
+            buffer[i][j] = sum;
+        }
+    }
+
+    // Clearing temporary variables
+    pixel_val = 0;
+    sum = 0;
+
+    // COLUMN wise convolution
+    for(j = 0; j < Cols; j++)
+    {
+        for(i = 0; i < Rows; i++)
+        {
+            sum = 0;
+            for(x = 0; x < window; x++)
+            {
+                // Checking image boundary
+                if( (i + x) >= Rows)
+                    pixel_val = 0;
+                else
+                    pixel_val = buffer[i+x][j];
+
+                // Calculate Sum
+                sum += pixel_val;
+            }
+            image_out[i+x][j] = (sum / (window * window));
+        }
+    }
+
+}
+
+
+
+
+
+// *************************************** 2D Convolution *************************************************
 
 unsigned char** Convolve(unsigned char** image, int ROWS, int COLS, unsigned char filter)
 {
