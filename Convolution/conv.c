@@ -1,15 +1,22 @@
-/* This program is a C implementation of a 7x7 mean filter 
-Author: Vivek Koodli Udupa
-Class: Clemson Intro to Computer Vision by Adam Hoover 
-Purpose: Rewriting all codes from CV class
-Date: Jan 1 2021
-*/
+/*======================================================================* 
+*                                                                       *
+*        This program is a C implementation of a 7x7 mean filter using  *
+*        3 differnent methods and showing they yield the same result    *
+*        Methods:                                                       *
+*        (1) Seperable filters                                          *
+*        (2) Seperable Filter with Sliding Window                       *
+*        (3) 2D Convolution                                             *
+*                                                                       *
+*        Author: Vivek Koodli Udupa                                     *        
+*        Class: Clemson Intro to Computer Vision by Adam Hoover         *    
+*        Start Date: Jan 1 2021                                         *
+*        End Date: TBD                                                  *
+*                                                                       *        
+========================================================================*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-
 
 // Function Declarations
 
@@ -65,7 +72,8 @@ int main(int argc, char *argv[])
 
 	
 	// Allocating dynamic memory for image
-	image = (unsigned char **)calloc(ROWS, sizeof(unsigned char *));
+    arry_create(&image, &ROWS, &COLS);
+/*	image = (unsigned char **)calloc(ROWS, sizeof(unsigned char *));
 	for (i = 0; i < ROWS; i++)
 		image[i] = (unsigned char *)calloc(COLS, sizeof(unsigned char));
 
@@ -75,7 +83,7 @@ int main(int argc, char *argv[])
 		printf("unable to allocate %d x %d memory\n", ROWS, COLS);
 		exit(0);
 	}
-
+*/
 	// reading image data
 	for(i = 0; i < ROWS; i++)
 		fread(image[i], 1, COLS, fpt);
@@ -94,7 +102,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-
+//*******************************************************************************************
 int OpenFile(FILE **fp, char *path, char *mode)
 {
         printf("\nOpening file %s\n", path);
@@ -107,6 +115,7 @@ int OpenFile(FILE **fp, char *path, char *mode)
                 return 0;
 }
 
+//*******************************************************************************************
 int ReadFile(FILE *fp, char *header, int *row, int *col, int *byte)
 {
         fscanf(fp, "%s, %d, %d, %d", header, row, col, byte);
@@ -121,6 +130,7 @@ int ReadFile(FILE *fp, char *header, int *row, int *col, int *byte)
         
 }
 
+//*******************************************************************************************
 void ReadImage(FILE *fp, int **arr, int row, int col)
 {
         int i,j;
@@ -137,6 +147,7 @@ void ReadImage(FILE *fp, int **arr, int row, int col)
         fclose(fp);
 }
 
+//*******************************************************************************************
 void WriteImage(FILE *fp, char *path, char *mode, int **arr, char *header, int *row, int *col, int *byte)
 {
         int i,j;
@@ -171,6 +182,11 @@ void arry_create(unsigned char ***arry, int *rows, int *cols)
     for(int i = 0; i < rows; i++)
         arr[i] = (unsigned char *) calloc(cols, sizeof(unsigned char));
 
+   if(arry == NULL)
+   {
+        printf("Unable to allocate %d x %d memory", rows, cols);
+   }
+
 }
 
 
@@ -180,11 +196,12 @@ int SF_Conv(unsigned char ***image_in, unsigned char ***image_out, unsigned char
 {
     // This function performs Row + Column seperable mean filter convolution 
 
-    int i, j, x, y;
+    int i, j, x, y, shift;
     unsigned char buffer[Rows][Cols];
     unsigned char sum, pixel_val;
-
-    // ROW wise convolution 
+    
+    shift = (int)window / 2;
+    // COLUMN wise convolution 
     for(i = 0; i < Rows; i++)
     {
         for(j = 0; j < Cols; j++)
@@ -193,7 +210,7 @@ int SF_Conv(unsigned char ***image_in, unsigned char ***image_out, unsigned char
             for(x = 0; x < window; x++)
             {
                 // check image boundary
-                if ( (j + x) >= Cols)
+                if ( (j + x) >= Cols )
                     pixel_val = 0;
                 else
                     pixel_val = image_in[i][j+x];
@@ -202,7 +219,7 @@ int SF_Conv(unsigned char ***image_in, unsigned char ***image_out, unsigned char
                 sum += pixel_val;
 
             }
-            buffer[i][j] = sum;
+            buffer[i][j+shift] = sum;
         }
     }
 
@@ -210,8 +227,8 @@ int SF_Conv(unsigned char ***image_in, unsigned char ***image_out, unsigned char
     pixel_val = 0;
     sum = 0;
 
-    // COLUMN wise convolution
-    for(j = 0; j < Cols; j++)
+    // ROW wise convolution
+    for(j = shift; j < Cols - shift; j++)
     {
         for(i = 0; i < Rows; i++)
         {
@@ -227,25 +244,26 @@ int SF_Conv(unsigned char ***image_in, unsigned char ***image_out, unsigned char
                 // Calculate Sum
                 sum += pixel_val;
             }
-            image_out[i+x][j] = (sum / (window * window));
+            image_out[i+shift][j] = (sum / (window));
         }
     }
 
 }
 
 
-
-
-
 // *************************************** 2D Convolution *************************************************
 
-unsigned char** Convolve(unsigned char** image, int ROWS, int COLS, unsigned char filter)
+unsigned char** Convolve(unsigned char*** image, int *rows, int *cols, int *window)
 {
-	int temp = 0,i,j,x,y;
+	int temp,i,j,x,y;
+	int fr,fc;
+    fr = (int) window/2;
+    fc = (int) window/2;
+	temp = 0;
 	
-	for( i = 1; i < ROWS - 1; i++)
+    for( i = 1; i < ROWS - 1; i++)
 	{
-		for(j = 1; j < COLS - 1; j++)
+        for(j = 1; j < COLS - 1; j++)
 		{
 			for(x = 0; x < fr; x++)
 			{
@@ -254,12 +272,12 @@ unsigned char** Convolve(unsigned char** image, int ROWS, int COLS, unsigned cha
 					// Checxing for edge pixeys and coynvoyve
 					if([i+x-1] < ROWS || [i+x-1] > ROWS || [j+y-1] < COLS || [j+y-1] > COLS)
 						image[i+x-1][j+y-1] = 0;
-					eyse
-						temp = temp + (image[i+x-1][j+y-1] * filter[x][y]);
+					else
+						temp = temp + (image[i+x-1][j+y-1] 
 				}
 			}
-			image[i][j] = temp;
-			temp = 0;
+			image[i][j] = temp/(window * window);
+            temp = 0;
 		}
 	}
 
