@@ -14,6 +14,7 @@
 *                                                                       *        
 ========================================================================*/
 #include "conv.h"
+#include "allocate.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,31 +29,41 @@ int main(int argc, char *argv[])
 	int 		    fr=7, fc=7;
 
 	// Validating command line arguments 
-	if(argc != 2)
+/*	if(argc != 2)
 	{
 		printf("Invalid inputs \n Usage: ./[executable] [filename] ");
 		exit(0);
 	}
-   
-
-    // Open file in "read mode"
+*/   
+   // Open file in "read mode"
    // OpenFile(&fpt, argv[1], 'r');
+    
+    if(DEBUG){
+        ROWS = 10;
+        COLS = 10;
+    }
 
-    ROWS = 10;
-    COLS = 10;
     // Allocate Dynamic Memory for storing image values 
     arry_create(&image, &ROWS, &COLS);
+
+
+    // DEBUG Mode to allocate values to 2d array and print it
+    if(DEBUG)
+    {
+        for(i = 0; i < ROWS; i++)
+            for(j = 0; j < COLS; j++)
+                image[i][j] = ((i*COLS) + (j + 1));
+        
+        for(i = 0; i < ROWS; i++)
+        {
+            printf("\n");
+            for(j = 0; j < COLS; j++)
+                printf("%d \t",image[i][j]);
+        }
+        printf("\n");
+    }
 
     return 0;
 }
 
-void arry_create(unsigned char ***arry, int *rows, int *cols)
-{
-    arry = (unsigned char **) calloc(rows, sizeof(unsigned char*));
-    for(int i = 0; i < rows; i++)
-        arry[i] = (unsigned char *) calloc(cols, sizeof(unsigned char));
 
-    if(arry == NULL)
-        printf("Failed to allocate %d x %d memory", rows, cols);
-}
-}
