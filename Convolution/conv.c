@@ -14,7 +14,7 @@
 *                                                                       *        
 ========================================================================*/
 #include "conv.h"
-#include "allocate.h"
+#include "memory_management.h"
 
 int main(int argc, char *argv[])
 {
@@ -62,7 +62,8 @@ int main(int argc, char *argv[])
         }
         printf("\n");
     }
-
+    
+    arry_free(&image, ROWS);
     return 0;
 }
 
