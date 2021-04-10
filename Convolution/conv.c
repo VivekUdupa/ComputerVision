@@ -29,14 +29,16 @@ int main(int argc, char *argv[])
 	int 		    fr=7, fc=7;
 
 	// Validating command line arguments 
-/*	if(argc != 2)
+	if(argc != 2)
 	{
 		printf("Invalid inputs \n Usage: ./[executable] [filename] ");
 		exit(0);
 	}
-*/   
-   // Open file in "read mode"
-   // OpenFile(&fpt, argv[1], 'r');
+   
+    // Open file in "read mode"
+    OpenFile(&fpt, argv[1], 'r');
+   
+    ReadHeader(&fpt, argv[1], &header, &ROWS, &COLS, &BYTES);
     
     if(DEBUG){
         ROWS = 10;
@@ -46,6 +48,7 @@ int main(int argc, char *argv[])
     // Allocate Dynamic Memory for storing image values 
     arry_create(&image, &ROWS, &COLS);
 
+    ReadImage(&fpt, &image, ROWS, COLS);
 
     // DEBUG Mode to allocate values to 2d array and print it
     if(DEBUG)
@@ -63,8 +66,46 @@ int main(int argc, char *argv[])
         printf("\n");
     }
     
+    // Basic 2D Convolution
+    
+    // Seperable Filter Convolution
+
+    //Seperable Filter Convolution with Sliding Window
+
+    // De-allocate memory
     arry_free(&image, ROWS);
     return 0;
 }
 
+OpenFile(FILE **fpt, char fname, char mode)
+{
+    if( (*fpt = fopen(fname, mode)) == NULL)
+    {
+        printf("unable to open %s for reading\n", fname);
+        exit(0);
+    }
+}
 
+ReadHeader(FILE **fpt, char fname, char *header, int *row, int *col, int *byte)
+{
+    int i; 
+    i = fscanf(*fpt, "%s %d %d %d", header, row, col, byte);
+    if( i != 4)
+    {
+        printf("%s is notan 8-bit PPM greyscale (P5) image\n" fname);
+        exit(0);
+    }
+    
+}
+
+
+ReadImage(FILE **fpt, char ***arr, const int row, const int col)
+{
+    int i, j;
+
+    for(i = 0; i < rows; i++)
+    {
+        fread( (*image)[i], 1, cols, *fpt);
+        fclose( *fpt );
+    }
+}
