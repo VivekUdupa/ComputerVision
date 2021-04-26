@@ -36,22 +36,30 @@ int main(int argc, char *argv[])
 	}
    
     // Open file in "read mode"
-    OpenFile(&fpt, argv[1], 'r');
-   
-    ReadHeader(&fpt, argv[1], &header, &ROWS, &COLS, &BYTES);
+    OpenFile(&fpt, argv[1], "r");
+  
+    // Read Image parameters
+    ReadHeader(&fpt, argv[1], header, &ROWS, &COLS, &BYTES);
     
-    if(DEBUG){
+    
+    if(DEBUG)
+    {
+        printf("Header: %s, rows: %d, cols: %d, bytes: %d\n", header, ROWS, COLS, BYTES);
+    }
+    
+    if(!DEBUG){
         ROWS = 10;
         COLS = 10;
     }
-
+    
     // Allocate Dynamic Memory for storing image values 
     arry_create(&image, &ROWS, &COLS);
-
-    ReadImage(&fpt, &image, ROWS, COLS);
+    
+    // Read Image parameters
+    ReadImage(&fpt, image, ROWS, COLS);
 
     // DEBUG Mode to allocate values to 2d array and print it
-    if(DEBUG)
+    if(!DEBUG)
     {
         for(i = 0; i < ROWS; i++)
             for(j = 0; j < COLS; j++)
@@ -77,7 +85,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-OpenFile(FILE **fpt, char fname, char mode)
+void OpenFile(FILE **fpt, char *fname, char *mode)
 {
     if( (*fpt = fopen(fname, mode)) == NULL)
     {
@@ -86,26 +94,41 @@ OpenFile(FILE **fpt, char fname, char mode)
     }
 }
 
-ReadHeader(FILE **fpt, char fname, char *header, int *row, int *col, int *byte)
+void ReadHeader(FILE **fpt, char *fname, char *header, int *row, int *col, int *byte)
 {
     int i; 
     i = fscanf(*fpt, "%s %d %d %d", header, row, col, byte);
-    if( i != 4)
+    fclose(*fpt);
+    printf("header is: %s\n", header);
+    if( i != 4 || strcmp(header, "P5") != 0 || *byte != 255 )
     {
-        printf("%s is notan 8-bit PPM greyscale (P5) image\n" fname);
+        printf("%s is not a 8-bit PPM greyscale (P5) image\n", fname);
         exit(0);
     }
     
 }
 
 
-ReadImage(FILE **fpt, char ***arr, const int row, const int col)
+void ReadImage(FILE **fpt, unsigned char **arr, const int row, const int col)
 {
     int i, j;
-
-    for(i = 0; i < rows; i++)
+    unsigned char buffer; 
+    
+    for(i = 0; i < row; i++)
     {
-        fread( (*image)[i], 1, cols, *fpt);
-        fclose( *fpt );
+        for(j = 0; j < col; j++)
+        {
+            fread( &buffer, 1, 1, *fpt);
+            arr[i][j] = buffer;
+        }
     }
+    fclose( *fpt );
+/*
+    for(i = 0; i < row; i++)
+    {
+        fread( buffer, 1, col, *fpt);
+        arr[i] = buffer[0];
+    }
+    fclose( *fpt );
+*/
 }

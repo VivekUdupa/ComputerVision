@@ -5,9 +5,9 @@
 
 #define DEBUG 1
 // File Operations
-int OpenFile(FILE **fpt, char path, char mode);
-int ReadHeader(FILE *fpt, char fname, char *header, int *row, int *col, int *bytes);
-void ReadImage(FILE *fpt, int ***arr, const int row, const int col);
+void OpenFile(FILE **fpt, char *fname, char *mode);
+void ReadHeader(FILE **fpt, char *fname, char *header, int *row, int *col, int *byte);
+void ReadImage(FILE **fpt, unsigned char **arr, const int row, const int col);
 void WriteImage(FILE *fpt, char *path, char *mode, int **arr, char *header, int *row, int *col, int *byte);
 
 // Convolution operations
