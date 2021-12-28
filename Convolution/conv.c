@@ -20,13 +20,13 @@ int main(int argc, char *argv[])
 {
     
     // Declaration and Initialiation
-    FILE 		    *fpt;
+	FILE 		*fpt;
 	unsigned char 	**image;
-	char 		    header[80];
-	int		        ROWS,COLS,BYTES;
-	int		        i,j,b,k,l,img_px,temp;
+	char 		header[80];
+	int		ROWS,COLS,BYTES;
+	int		i,j,b,k,l,img_px,temp;
 	unsigned char 	filter[7][7];
-	int 		    fr=7, fc=7;
+	int 		fr=7, fc=7;
 
 	// Validating command line arguments 
 	if(argc != 2)
@@ -131,4 +131,85 @@ void ReadImage(FILE **fpt, unsigned char **arr, const int row, const int col)
     }
     fclose( *fpt );
 */
+}
+
+// sliding window convolution
+void SW_Conv(unsigned char **image, const int row, const int col, const int fl, const int fr)
+{
+	int i,j,k;
+	unsigned char new_image[255][255]
+	unsigned char sum;
+	
+	//stride through columns
+	for(i = 0; i < row; i++)
+	{
+		for(j=0;j<col;j++)
+		{
+			sum = 0;
+			for(k = j; k < fc; k++)
+			{
+				if(k < col)
+				{
+					sum = sum + image[i][k]
+				}
+				else
+				{
+					break;
+				}	
+			}
+			new_image[i][j] = sum;	
+		}
+	}
+	
+	//stride through rows
+	for(j=0;j<col;j++)
+	{
+		for(i=0;i<row;i++)
+		{
+			for(k=i;k<fr;k++)
+			{
+				if(k<row)
+				{
+					sum = sum + new_image[k][j];
+				}
+				else
+				{
+					break;
+				}
+			}
+			new_image[i][j] = sum;		
+		}
+	}
+	
+}
+	
+	//2d Convolution
+	
+void convol(unsigned char **image, const int row, const int col, const int fr, const int fl)
+{
+	int i,j,k,l;
+	const char sum;
+
+	for(i=0;i<row;i++)
+	{
+		for(j=0;j<col;j++)
+		{	
+			sum = 0;
+			for(k=i; k<fr; k++)
+			{
+				for(l=j; l<fc; l++)
+				{
+					if(k < row && l < col)
+					{
+						sum = sum + image[k][l];
+					}
+					else
+					{
+						break;
+					}	
+				}
+			}
+			image[i+fr/2][j+fl/2] = sum;
+		}
+	}
 }
